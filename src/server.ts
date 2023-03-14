@@ -220,7 +220,25 @@ app.get<{
 app.post<{
   Params: IParams;
 }>("/devices/:serialNumber/events", async (request, reply) => {
-  // TODO: validate body
+  const eventSchema = z.object({
+    macAddress: z.string(),
+    ipAddress: z.string(),
+    soilMoisture: z.number(),
+    humidity: z.number(),
+    temperature: z.number(),
+    lighIntensity: z.number(),
+    happenedAt: z.string().datetime(),
+  });
+
+  const {
+    macAddress,
+    ipAddress,
+    soilMoisture,
+    humidity,
+    temperature,
+    lighIntensity,
+    happenedAt,
+  } = eventSchema.parse(request.body);
 
   const { serialNumber } = request.params;
 
@@ -242,9 +260,20 @@ app.post<{
     });
   }
 
-  // TODO: create device event
+  const deviceEvent = await databaseClient.deviceEvent.create({
+    data: {
+      deviceId: device.id,
+      macAddress,
+      ipAddress,
+      soilMoisture,
+      humidity,
+      temperature,
+      lighIntensity,
+      happenedAt,
+    },
+  });
 
-  return reply.status(200).send([]);
+  return reply.status(201).send(deviceEvent);
 });
 
 app
