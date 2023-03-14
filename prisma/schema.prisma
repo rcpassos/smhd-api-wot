@@ -11,10 +11,47 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  email       String       @unique
+  password    String
+  createdAt   DateTime     @default(now())
+  userDevices UserDevice[]
 
   @@map("users")
+}
+
+model Device {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  serialNumber String        @unique
+  createdAt    DateTime      @default(now())
+  deviceEvents DeviceEvent[]
+  userDevices  UserDevice[]
+
+  @@map("devices")
+}
+
+model UserDevice {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String @db.ObjectId
+  user     User   @relation(fields: [userId], references: [id])
+  deviceId String @db.ObjectId
+  device   Device @relation(fields: [deviceId], references: [id])
+
+  @@map("userDevices")
+}
+
+model DeviceEvent {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  deviceId      String   @db.ObjectId
+  macAddress    String
+  ipAddress     String
+  soilMoisture  Float
+  humidity      Float
+  temperature   Float
+  lighIntensity Float
+  device        Device   @relation(fields: [deviceId], references: [id])
+  happenedAt    DateTime
+  createdAt     DateTime @default(now())
+
+  @@map("deviceEvents")
 }
