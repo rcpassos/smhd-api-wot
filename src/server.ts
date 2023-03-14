@@ -222,7 +222,7 @@ app.post<{
 }>("/devices/:serialNumber/events", async (request, reply) => {
   const eventSchema = z.object({
     macAddress: z.string(),
-    ipAddress: z.string(),
+    ipAddress: z.string().ip(),
     soilMoisture: z.number(),
     humidity: z.number(),
     temperature: z.number(),
