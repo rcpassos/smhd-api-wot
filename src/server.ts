@@ -187,8 +187,14 @@ app.get(
   }
 );
 
+interface IQuerystring {
+  startDate?: string;
+  endDate?: string;
+}
+
 app.get<{
   Params: IParams;
+  Querystring: IQuerystring;
 }>(
   "/devices/:serialNumber/events",
   { onRequest: [app.authenticate] },
@@ -209,8 +215,39 @@ app.get<{
       return reply.status(404).send({ message: "Can not find the device" });
     }
 
+    const queryParamsSchema = z.object({
+      startDate: z.optional(z.string().datetime()),
+      endDate: z.optional(z.string().datetime()),
+    });
+
+    const { startDate, endDate } = queryParamsSchema.parse(request.query);
+
+    const queryArgs: any = {};
+
+    if (startDate && endDate) {
+      queryArgs.happenedAt = {
+        lte: new Date(endDate),
+        gte: new Date(startDate),
+      };
+    }
+
+    if (startDate && !endDate) {
+      queryArgs.happenedAt = {
+        gte: new Date(startDate),
+      };
+    }
+
+    if (!startDate && endDate) {
+      queryArgs.happenedAt = {
+        lte: new Date(endDate),
+      };
+    }
+
     const deviceEvents = await databaseClient.deviceEvent.findMany({
-      where: { deviceId: device?.id },
+      where: {
+        deviceId: device?.id,
+        ...queryArgs,
+      },
     });
 
     return reply.status(200).send(deviceEvents);
