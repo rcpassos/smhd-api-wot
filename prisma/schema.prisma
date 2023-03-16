@@ -45,10 +45,10 @@ model DeviceEvent {
   deviceId      String   @db.ObjectId
   macAddress    String
   ipAddress     String
-  soilMoisture  Float
-  humidity      Float
-  temperature   Float
-  lighIntensity Float
+  soilMoisture  Float?
+  humidity      Float?
+  temperature   Float?
+  lighIntensity Float?
   device        Device   @relation(fields: [deviceId], references: [id])
   happenedAt    DateTime
   createdAt     DateTime @default(now())

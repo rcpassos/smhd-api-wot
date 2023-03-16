@@ -260,10 +260,10 @@ app.post<{
   const eventSchema = z.object({
     macAddress: z.string(),
     ipAddress: z.string().ip(),
-    soilMoisture: z.number(),
-    humidity: z.number(),
-    temperature: z.number(),
-    lighIntensity: z.number(),
+    soilMoisture: z.optional(z.number()),
+    humidity: z.optional(z.number()),
+    temperature: z.optional(z.number()),
+    lighIntensity: z.optional(z.number()),
     happenedAt: z.string().datetime(),
   });
 
